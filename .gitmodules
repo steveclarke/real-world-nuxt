@@ -34,3 +34,7 @@
 	path = apps/github-explorer
 	url = https://github.com/SeanLuis/github-explorer.git
 	branch = master
+[submodule "apps/openstock"]
+	path = apps/openstock
+	url = https://github.com/florianjs/openstock.git
+	branch = main
