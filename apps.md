@@ -14,5 +14,6 @@ This is a curated list of all the Nuxt applications included in this repository.
 | **Elk** | A nimble Mastodon web client built with Nuxt. Features PWA support, multiple accounts, and a beautiful modern UI. | [elk-zone/elk](https://github.com/elk-zone/elk) |
 | **GitHub Explorer** | Modern web app to discover, explore, and track trending open-source projects on GitHub. Built with Nuxt 3 and TailwindCSS. | [SeanLuis/github-explorer](https://github.com/SeanLuis/github-explorer) |
 | **OpenStock** | Modern inventory management system built with Nuxt 4, NuxtHub, and Drizzle ORM. | [florianjs/openstock](https://github.com/florianjs/openstock) |
+| **ExcalidrawNuxt** | Collaborative drawing application built with Nuxt 4 and Vue 3, reimplementing Excalidraw with Vue composables, RoughJS, and Tailwind CSS v4. | [alexanderop/excalidrawNuxt](https://github.com/alexanderop/excalidrawNuxt) |
 
 

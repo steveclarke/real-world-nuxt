@@ -38,3 +38,6 @@
 	path = apps/openstock
 	url = https://github.com/florianjs/openstock.git
 	branch = main
+[submodule "apps/excalidrawNuxt"]
+	path = apps/excalidrawNuxt
+	url = https://github.com/alexanderop/excalidrawNuxt.git
