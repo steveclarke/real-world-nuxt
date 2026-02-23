@@ -126,7 +126,7 @@ This repository structure and documentation is provided as-is. Each application 
 
 ## Other Real World Codebase Collections
 
-- Real World Rails https://github.com/eliotsykes/real-world-rails
+- Real World Rails https://github.com/steveclarke/real-world-rails
 - Real World Sinatra https://github.com/jeromedalbert/real-world-sinatra
 - Real World Ruby Apps https://github.com/jeromedalbert/real-world-ruby-apps
 - Real World Django https://github.com/ckrybus/real-world-django
