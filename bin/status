@@ -1,22 +1,63 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-echo "📊 Real World Nuxt Status"
-echo ""
-echo "📁 Submodules:"
-git submodule status
+################################################################################
+# Real World Nuxt Status
+################################################################################
+#
+# OVERVIEW
+# --------
+# Show how many apps are available and how many are initialized.
+#
+# USAGE
+# -----
+#   bin/status
+#
+################################################################################
 
-echo ""
-echo "📈 Summary:"
-submodule_count=$(git submodule status | wc -l | tr -d ' ')
-initialized_count=$(git submodule status | grep -v '^-' | wc -l | tr -d ' ')
-echo "   Total apps: $submodule_count"
-echo "   Initialized: $initialized_count"
+# Colors
+green='\033[0;32m'
+yellow='\033[1;33m'
+nc='\033[0m'
 
-if [ "$initialized_count" -eq "0" ]; then
-    echo ""
-    echo "💡 No apps initialized yet. Run 'bin/setup' to download all apps."
-elif [ "$initialized_count" -lt "$submodule_count" ]; then
-    echo ""
-    echo "💡 Some apps not initialized. Run 'bin/setup' to download remaining apps."
-fi
+################################################################################
+# Main Orchestration
+################################################################################
 
+main() {
+  show_counts
+}
+
+################################################################################
+# Helper Functions
+################################################################################
+
+log() { echo -e "${green}==>${nc} ${1}"; }
+warn() { echo -e "${yellow}==>${nc} ${1}"; }
+
+################################################################################
+# Core Functions
+################################################################################
+
+show_counts() {
+  local submodule_count initialized_count
+
+  submodule_count=$(git submodule status | wc -l | tr -d ' ')
+  initialized_count=$(git submodule status | grep -cv '^-' || true)
+
+  log "Real World Nuxt Status"
+  echo "    Total:       $submodule_count"
+  echo "    Initialized: $initialized_count"
+
+  if [ "$initialized_count" -eq "0" ]; then
+    warn "No apps initialized yet. Run 'bin/setup' to download all apps."
+  elif [ "$initialized_count" -lt "$submodule_count" ]; then
+    warn "Some apps not initialized. Run 'bin/setup' to download remaining apps."
+  fi
+}
+
+################################################################################
+# Script Execution
+################################################################################
+
+main "$@"

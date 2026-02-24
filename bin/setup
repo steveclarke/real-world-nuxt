@@ -1,16 +1,52 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
-echo "🚀 Setting up Real World Nuxt..."
-echo ""
+################################################################################
+# Setup Real World Nuxt
+################################################################################
+#
+# OVERVIEW
+# --------
+# Initialize and download all submodules after first clone.
+#
+# USAGE
+# -----
+#   bin/setup
+#
+################################################################################
 
-echo "⬇️  Initializing and downloading all Nuxt app submodules..."
-echo "    (This may take a few minutes on first run)"
-echo ""
-GIT_LFS_SKIP_SMUDGE=1 git submodule update --init --single-branch --jobs 4
+# Colors
+green='\033[0;32m'
+nc='\033[0m'
 
-echo ""
-echo "✅ Setup complete! You can now explore the apps/ directory."
-echo ""
-echo "💡 Tip: Run 'bin/update' anytime to pull the latest changes."
+################################################################################
+# Main Orchestration
+################################################################################
 
+main() {
+  init_submodules
+  log "Setup complete! Explore the apps/ directory."
+  log "Run 'bin/update' anytime to pull the latest changes."
+}
+
+################################################################################
+# Helper Functions
+################################################################################
+
+log() { echo -e "${green}==>${nc} ${1}"; }
+
+################################################################################
+# Core Functions
+################################################################################
+
+init_submodules() {
+  log "Initializing and downloading all submodules..."
+  log "This may take a few minutes on first run"
+  GIT_LFS_SKIP_SMUDGE=1 git submodule update --init --single-branch --jobs 4
+}
+
+################################################################################
+# Script Execution
+################################################################################
+
+main "$@"

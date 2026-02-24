@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+################################################################################
+# Add a Real World Nuxt App
+################################################################################
+#
+# OVERVIEW
+# --------
+# Add a new Nuxt app as a git submodule by GitHub URL. Automatically detects
+# the default branch.
+#
+# USAGE
+# -----
+#   bin/add <github-url>
+#
+#   github-url  GitHub repo URL (e.g. https://github.com/user/repo)
+#
+# EXAMPLES
+# --------
+#   bin/add https://github.com/nuxt/movies
+#   bin/add https://github.com/elk-zone/elk
+#
+################################################################################
+
+# Colors
+green='\033[0;32m'
+red='\033[0;31m'
+nc='\033[0m'
+
+################################################################################
+# Main Orchestration
+################################################################################
+
+main() {
+  parse_arguments "$@"
+  parse_repo_url
+  check_not_exists
+  lookup_default_branch
+  add_submodule
+  show_next_steps
+}
+
+################################################################################
+# Helper Functions
+################################################################################
+
+log() { echo -e "${green}==>${nc} ${1}"; }
+error() { echo -e "${red}Error:${nc} ${1}" >&2; exit 1; }
+
+################################################################################
+# Core Functions
+################################################################################
+
+parse_arguments() {
+  if [ -z "${1:-}" ]; then
+    echo "Usage: bin/add <github-url>"
+    echo ""
+    echo "  github-url  GitHub repo URL (e.g. https://github.com/user/repo)"
+    echo ""
+    echo "Examples:"
+    echo "  bin/add https://github.com/nuxt/movies"
+    echo "  bin/add https://github.com/elk-zone/elk"
+    exit 1
+  fi
+
+  url="$1"
+}
+
+parse_repo_url() {
+  repo_path=$(echo "$url" | sed 's|.*github.com/||' | sed 's|\.git$||' | sed 's|/$||')
+  name=$(basename "$repo_path")
+  dest="apps/$name"
+}
+
+check_not_exists() {
+  if [ -d "$dest" ]; then
+    error "$dest already exists"
+  fi
+}
+
+lookup_default_branch() {
+  log "Looking up default branch for $repo_path..."
+  default_branch=$(gh repo view "$repo_path" --json defaultBranchRef -q '.defaultBranchRef.name' 2>/dev/null || true)
+
+  if [ -z "$default_branch" ]; then
+    error "Could not find repo $repo_path"
+  fi
+}
+
+add_submodule() {
+  log "Adding $name ($default_branch branch) to $dest..."
+  GIT_LFS_SKIP_SMUDGE=1 git submodule add -b "$default_branch" "git@github.com:${repo_path}.git" "$dest"
+  log "Added $name to $dest"
+}
+
+show_next_steps() {
+  echo ""
+  echo "Next steps:"
+  echo "  1. Add an entry to apps.md"
+  echo "  2. Commit and push"
+}
+
+################################################################################
+# Script Execution
+################################################################################
+
+main "$@"
