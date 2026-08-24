@@ -1,16 +1,56 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
-echo "📦 Updating Real World Nuxt..."
-echo ""
+################################################################################
+# Update Real World Nuxt
+################################################################################
+#
+# OVERVIEW
+# --------
+# Pull latest changes and update all submodules to their latest remote commits.
+#
+# USAGE
+# -----
+#   bin/update
+#
+################################################################################
 
-echo "⬇️  Pulling latest changes from real-world-nuxt..."
-git pull
+# Colors
+green='\033[0;32m'
+nc='\033[0m'
 
-echo ""
-echo "⬇️  Updating all Nuxt app submodules to their latest versions..."
-GIT_LFS_SKIP_SMUDGE=1 git submodule update --remote --merge
+################################################################################
+# Main Orchestration
+################################################################################
 
-echo ""
-echo "✅ All done! Your Real World Nuxt apps are up to date."
+main() {
+  pull_latest
+  update_submodules
+  log "All done! Your Real World Nuxt apps are up to date."
+}
 
+################################################################################
+# Helper Functions
+################################################################################
+
+log() { echo -e "${green}==>${nc} ${1}"; }
+
+################################################################################
+# Core Functions
+################################################################################
+
+pull_latest() {
+  log "Pulling latest changes..."
+  git pull
+}
+
+update_submodules() {
+  log "Updating all submodules to their latest versions..."
+  GIT_LFS_SKIP_SMUDGE=1 git submodule update --remote --jobs 8
+}
+
+################################################################################
+# Script Execution
+################################################################################
+
+main "$@"

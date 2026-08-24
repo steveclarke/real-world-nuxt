@@ -1,0 +1,67 @@
+name: Update submodules
+on:
+  schedule:
+    - cron: '17 8 * * 1' # Run weekly on Mondays at 8:17am UTC
+  workflow_dispatch: # Can be run manually from GitHub UI
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Permit git push
+      pull-requests: write
+    steps:
+      - name: Set TODAY env var
+        run: echo "TODAY=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Create branch
+        run: git checkout -b submodules-update-$TODAY
+
+      - name: Update submodules to latest
+        run: |
+          failed=""
+          for path in $(git config --file .gitmodules --get-regexp path | awk '{print $2}'); do
+            if ! git submodule update --init --remote --checkout --depth 1 "$path" 2>&1; then
+              echo "::warning::Failed to update $path"
+              failed="$failed $path"
+            fi
+          done
+          if [ -n "$failed" ]; then
+            echo "::warning::Failed submodules:$failed"
+          fi
+
+      - name: Configure git user
+        run: |
+          git config user.name ${{ github.actor }}
+          git config user.email ${{ github.actor }}@users.noreply.github.com
+
+      - name: Commit
+        id: commit
+        run: |
+          git add .
+          if git diff --cached --quiet; then
+            echo "No submodule changes"
+            echo "changes=false" >> $GITHUB_OUTPUT
+          else
+            git commit -m "Update submodules $TODAY"
+            echo "changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Push branch
+        if: steps.commit.outputs.changes == 'true'
+        run: |
+          git config push.autoSetupRemote true
+          git push
+
+      - name: Open pull request
+        if: steps.commit.outputs.changes == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --fill \
+            --reviewer steveclarke \
+            --base ${{ github.ref_name }}
